@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ title or "Aura" }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen bg-zinc-950 text-zinc-100">
+    <div class="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_20%_15%,rgba(229,211,179,0.14),transparent_25%),radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.06),transparent_35%),radial-gradient(circle_at_50%_90%,rgba(255,255,255,0.04),transparent_50%)]"></div>
+
+    <header class="sticky top-0 z-40 border-b border-white/10 bg-black/20 backdrop-blur-md">
+      <div class="mx-auto flex flex-wrap items-center justify-between gap-3 px-4 py-4 max-w-6xl">
+        <a href="{{ url_for('index') }}" class="group flex items-center gap-3">
+          <div class="flex h-11 w-11 items-center justify-center rounded-3xl bg-white/10 shadow-lg shadow-black/20">
+            <span class="text-lg font-black text-white">A</span>
+          </div>
+          <div class="leading-tight">
+            <div class="text-sm font-semibold tracking-[0.32em] text-white uppercase">Aura</div>
+            <div class="text-[11px] text-zinc-400">Modern wardrobe essentials</div>
+          </div>
+        </a>
+
+        <nav class="flex flex-wrap items-center gap-2">
+          {% for c in nav_categories %}
+          <a
+            href="{{ url_for('index', category=c.id) }}"
+            class="rounded-full px-4 py-2 text-sm font-medium transition {% if selected_category_id == c.id %}bg-white text-zinc-950{% else %}bg-white/5 text-zinc-200 hover:bg-white/10{% endif %}"
+          >
+            {{ c.name }}
+          </a>
+          {% endfor %}
+
+          <a
+            href="{{ url_for('view_cart') if session.get('user_id') else url_for('login') }}"
+            class="relative inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-100 transition hover:bg-white/10"
+          >
+            <span>Cart</span>
+            <span
+              id="cartBadge"
+              class="inline-flex min-w-[1.75rem] items-center justify-center rounded-full bg-white/10 px-2 py-0.5 text-xs font-semibold text-white"
+            >
+              {{ cart_count or 0 }}
+            </span>
+          </a>
+
+          {% if session.get('user_id') %}
+          <div class="hidden text-sm text-zinc-300 md:block">Hi, <span class="font-semibold text-white">{{ session.get('user_name') }}</span></div>
+          <form action="{{ url_for('logout') }}" method="post">
+            <button type="submit" class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-100 transition hover:bg-white/10">Logout</button>
+          </form>
+          {% else %}
+          <a href="{{ url_for('login') }}" class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-100 transition hover:bg-white/10">Login</a>
+          {% endif %}
+        </nav>
+      </div>
+    </header>
+
+    <main class="mx-auto w-full max-w-6xl px-4 py-6">
+      {% with messages = get_flashed_messages(with_categories=True) %}
+      {% if messages %}
+      <div class="mb-5 space-y-2">
+        {% for category, message in messages %}
+        <div
+          class="{% if category == 'success' %}border-[#E5D3B3]/30 bg-[#E5D3B3]/10 text-[#f3e6cb]{% else %}border-rose-400/30 bg-rose-400/10 text-rose-100{% endif %} rounded-2xl border px-4 py-3 text-sm"
+        >
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endwith %}
+
+      {% block content %}{% endblock %}
+    </main>
+
+    <script>
+      const badge = document.getElementById("cartBadge");
+      function setBadge(n) {
+        if (!badge) return;
+        badge.textContent = String(n ?? 0);
+      }
+
+      async function postJson(url) {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        });
+        let data = null;
+        try {
+          data = await res.json();
+        } catch {}
+        return { ok: res.ok, status: res.status, data };
+      }
+
+      function bindCartButtons() {
+        document.querySelectorAll("[data-add-to-cart]").forEach((btn) => {
+          btn.addEventListener("click", async (e) => {
+            e.preventDefault();
+            const productId = btn.getAttribute("data-add-to-cart");
+            btn.disabled = true;
+            btn.classList.add("opacity-70");
+            const r = await postJson(`/cart/add/${productId}`);
+            btn.disabled = false;
+            btn.classList.remove("opacity-70");
+            if (r.ok && r.data && r.data.ok) {
+              setBadge(r.data.cart_count);
+              btn.textContent = "Added";
+              setTimeout(() => {
+                btn.textContent = "Add to Cart";
+              }, 900);
+              return;
+            }
+            if (r.status === 401) {
+              window.location.href = "/login";
+              return;
+            }
+            window.location.reload();
+          });
+        });
+
+        document.querySelectorAll("[data-remove-from-cart]").forEach((btn) => {
+          btn.addEventListener("click", async (e) => {
+            e.preventDefault();
+            const productId = btn.getAttribute("data-remove-from-cart");
+            const r = await postJson(`/cart/remove/${productId}`);
+            if (r.ok && r.data && r.data.ok) {
+              setBadge(r.data.cart_count);
+              window.location.reload();
+              return;
+            }
+            window.location.reload();
+          });
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", bindCartButtons);
+    </script>
+  </body>
+</html>

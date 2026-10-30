@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="mb-12 grid gap-6 lg:grid-cols-[1.4fr_minmax(280px,0.8fr)]">
+    <div class="rounded-[2rem] border border-white/10 bg-zinc-950/70 p-8 shadow-2xl shadow-black/30 backdrop-blur-xl">
+      <div class="max-w-2xl">
+        <p class="text-sm font-semibold uppercase tracking-[0.32em] text-zinc-500">New season, new silhouettes</p>
+        <h1 class="mt-4 text-5xl font-semibold tracking-tight text-white md:text-6xl">Aura is the modern wardrobe for elevated everyday dressing.</h1>
+        <p class="mt-6 max-w-xl text-lg leading-8 text-zinc-300">Discover premium fashion pieces designed with minimalist tailoring, luxe textures, and effortless presence. Shop modern essentials, accessories, and statement shapes in one polished collection.</p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <span class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-zinc-200">Editorial silhouettes</span>
+          <span class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-zinc-200">Premium fabrics</span>
+          <span class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-zinc-200">Timeless details</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid gap-6">
+      <div class="overflow-hidden rounded-[2rem] border border-white/10 bg-zinc-950/70 p-6 shadow-2xl shadow-black/20">
+        <div class="text-sm font-semibold uppercase tracking-[0.3em] text-zinc-500">Aura Essentials</div>
+        <div class="mt-4 text-2xl font-semibold text-white">Fine layers, elegant proportions, and subtle luxe accents.</div>
+        <p class="mt-3 text-sm leading-6 text-zinc-400">Shop modern streetwear staples, smart tailoring, and refined accessories in a curated edit with a premium feel.</p>
+      </div>
+      <div class="overflow-hidden rounded-[2rem] border border-white/10 bg-zinc-950/70 p-6 shadow-2xl shadow-black/20">
+        <div class="text-sm font-semibold uppercase tracking-[0.3em] text-zinc-500">Editorial edit</div>
+        <div class="mt-4 text-2xl font-semibold text-white">The signature edit for a luminous yet understated wardrobe.</div>
+        <p class="mt-3 text-sm leading-6 text-zinc-400">From elevated basics to polished outerwear, Aura brings refined design and comfortable luxury together.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div>
+      <div class="text-3xl font-bold tracking-tight text-white">Featured Edit</div>
+      <div class="mt-2 text-sm text-zinc-400">A premium edit of capsule wardrobe pieces curated for modern dressing.</div>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      <a
+        href="{{ url_for('index') }}"
+        class="{% if not selected_category_id %}bg-white text-zinc-950 ring-1 ring-white/15{% else %}bg-white/5 text-zinc-200 hover:bg-white/10{% endif %} rounded-full border border-white/10 px-4 py-2 text-sm transition"
+      >
+        All
+      </a>
+      {% for c in nav_categories %}
+      <a
+        href="{{ url_for('index', category=c.id) }}"
+        class="{% if selected_category_id == c.id %}bg-white text-zinc-950 ring-1 ring-white/15{% else %}bg-white/5 text-zinc-200 hover:bg-white/10{% endif %} rounded-full border border-white/10 px-4 py-2 text-sm transition"
+      >
+        {{ c.name }}
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    {% for p in products %}
+    <div class="group overflow-hidden rounded-[2rem] border border-white/10 bg-zinc-950/80 shadow-2xl shadow-black/30 transition duration-300 hover:-translate-y-1 hover:shadow-black/40">
+      <div class="relative overflow-hidden rounded-[1.75rem] bg-zinc-950/80">
+        {% if p.product_url %}
+        <a href="{{ p.product_url }}" target="_blank" rel="noopener noreferrer">
+        <img
+          src="{{ p.image_url or ('https://picsum.photos/seed/product-' ~ p.id ~ '/640/480') }}"
+          alt="{{ p.name }}"
+          class="h-72 w-full object-cover transition duration-500 group-hover:scale-105"
+          loading="lazy"
+          data-product-id="{{ p.id }}"
+          onError="this.src='https://picsum.photos/seed/product-{{ p.id }}/640/480'"
+        />
+        </a>
+        {% else %}
+        <img
+          src="{{ p.image_url or ('https://picsum.photos/seed/product-' ~ p.id ~ '/640/480') }}"
+          alt="{{ p.name }}"
+          class="h-72 w-full object-cover transition duration-500 group-hover:scale-105"
+          loading="lazy"
+          data-product-id="{{ p.id }}"
+          onError="this.src='https://picsum.photos/seed/product-{{ p.id }}/640/480'"
+        />
+        {% endif %}
+        <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-zinc-950/15 to-transparent opacity-0 transition group-hover:opacity-100"></div>
+        <div class="absolute left-4 top-4 rounded-full border border-white/10 bg-black/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-300 backdrop-blur-sm">{{ p.category_name }}</div>
+      </div>
+
+      <div class="space-y-3 p-5">
+        <div class="space-y-1">
+          <div class="text-base font-semibold text-white">{{ p.name }}</div>
+          <p class="text-sm leading-6 text-zinc-400">{{ p.description or 'Refined design with premium material details.' }}</p>
+        </div>
+
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <div class="text-lg font-semibold text-white">₹{{ "%.2f"|format(p.price) }}</div>
+            <div class="text-xs uppercase tracking-[0.2em] text-zinc-500">
+              {% if p.stock > 0 %}
+                {% if p.stock > 10 %}In stock{% else %}Limited stock{% endif %}
+              {% else %}
+                Sold out
+              {% endif %}
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            {% if p.product_url %}
+            <a
+              href="{{ p.product_url }}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-zinc-100 transition duration-300 hover:bg-white/10"
+            >
+              View
+            </a>
+            {% endif %}
+            <button
+              data-add-to-cart="{{ p.id }}"
+              class="rounded-full bg-gradient-to-r from-[#E5D3B3] to-[#bfa77c] px-4 py-2 text-sm font-semibold text-zinc-950 transition duration-300 hover:brightness-110 active:scale-[0.98]"
+            >
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if not products %}
+  <div class="mt-10 rounded-[2rem] border border-white/10 bg-zinc-950/70 p-8 text-center shadow-2xl shadow-black/20">
+    <div class="text-lg font-semibold text-white">No products found</div>
+    <div class="mt-2 text-sm text-zinc-400">Try another category or browse our newest arrivals.</div>
+  </div>
+  {% endif %}
+{% endblock %}

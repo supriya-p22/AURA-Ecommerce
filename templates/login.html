@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="mx-auto grid max-w-5xl grid-cols-1 items-stretch gap-6 lg:grid-cols-2">
+    <div class="hidden rounded-[2rem] border border-white/10 bg-zinc-950/70 p-8 lg:block shadow-2xl shadow-black/20">
+      <div class="text-3xl font-semibold text-white">Welcome to Aura</div>
+      <div class="mt-3 text-sm leading-6 text-zinc-400">Sign in to save your selections, access premium checkout, and build a curated wardrobe with effortless luxury.</div>
+
+      <div class="mt-8 space-y-4 rounded-[2rem] border border-white/10 bg-black/30 p-6">
+        <div class="text-sm font-semibold uppercase tracking-[0.3em] text-zinc-500">Why Aura</div>
+        <ul class="space-y-3 text-sm text-zinc-300">
+          <li class="flex gap-3">
+            <span class="mt-1 inline-flex h-2.5 w-2.5 rounded-full bg-[#E5D3B3]"></span>
+            <span>Curated premium apparel with refined silhouettes.</span>
+          </li>
+          <li class="flex gap-3">
+            <span class="mt-1 inline-flex h-2.5 w-2.5 rounded-full bg-[#E5D3B3]"></span>
+            <span>Live cart updates and streamlined checkout.</span>
+          </li>
+          <li class="flex gap-3">
+            <span class="mt-1 inline-flex h-2.5 w-2.5 rounded-full bg-[#E5D3B3]"></span>
+            <span>Designed for modern lifestyle, effortless elegance.</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="rounded-[2rem] border border-white/10 bg-zinc-950/70 p-8 shadow-2xl shadow-black/20">
+      <div class="text-3xl font-semibold tracking-tight text-white">
+        {% if mode == 'signup' %}Create account{% else %}Sign in{% endif %}
+      </div>
+      <div class="mt-2 text-sm text-zinc-400">
+        {% if mode == 'signup' %}Join Aura and keep your favorite luxury pieces saved.{% else %}Access your curated wardrobe anytime.{% endif %}
+      </div>
+
+      <form method="post" action="{% if mode == 'signup' %}{{ url_for('signup') }}{% else %}{{ url_for('login') }}{% endif %}" class="mt-8 space-y-5">
+        {% if mode == 'login' and next_url %}
+          <input type="hidden" name="next" value="{{ next_url }}" />
+        {% endif %}
+
+        {% if mode == 'signup' %}
+        <div class="space-y-1">
+          <label class="text-xs font-semibold text-zinc-300">Name</label>
+          <input name="name" required placeholder="Your name" class="w-full rounded-3xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-sm text-white placeholder:text-zinc-500 outline-none transition focus:border-white/20" />
+        </div>
+        {% endif %}
+
+        <div class="space-y-1">
+          <label class="text-xs font-semibold text-zinc-300">Email</label>
+          <input type="email" name="email" required placeholder="you@aura.com" class="w-full rounded-3xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-sm text-white placeholder:text-zinc-500 outline-none transition focus:border-white/20" />
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-xs font-semibold text-zinc-300">Password</label>
+          <input type="password" name="password" required placeholder="••••••••" class="w-full rounded-3xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-sm text-white placeholder:text-zinc-500 outline-none transition focus:border-white/20" />
+          {% if mode == 'signup' %}
+          <div class="text-xs text-zinc-400">Minimum 6 characters.</div>
+          {% endif %}
+        </div>
+
+        <button type="submit" class="inline-flex w-full items-center justify-center rounded-3xl bg-gradient-to-r from-[#E5D3B3] to-[#bfa77c] px-4 py-3 text-sm font-semibold text-zinc-950 transition hover:brightness-110 active:brightness-95">{% if mode == 'signup' %}Sign up{% else %}Login{% endif %}</button>
+      </form>
+
+      <div class="mt-6 text-sm text-zinc-400">
+        {% if mode == 'signup' %}
+          Already have an account? <a href="{{ url_for('login') }}" class="font-semibold text-white hover:underline">Login</a>
+        {% else %}
+          New here? <a href="{{ url_for('signup') }}" class="font-semibold text-white hover:underline">Create an account</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

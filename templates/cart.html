@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="mb-6 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+    <div>
+      <div class="text-3xl font-semibold tracking-tight text-white">Your Cart</div>
+      <div class="mt-2 text-sm text-zinc-400">Review your selections and complete your order in one elegant checkout.</div>
+    </div>
+    <a
+      href="{{ url_for('index') }}"
+      class="rounded-full border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-zinc-100 transition hover:bg-white/10"
+    >
+      Continue Shopping
+    </a>
+  </div>
+
+  {% if not items %}
+    <div class="rounded-[2rem] border border-white/10 bg-zinc-950/70 p-12 text-center shadow-2xl shadow-black/20">
+      <div class="text-lg font-semibold text-white">Your cart is empty</div>
+      <div class="mt-2 text-sm text-zinc-400">Add luxury pieces from the collection to begin building your wardrobe.</div>
+    </div>
+  {% else %}
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div class="space-y-4 lg:col-span-2">
+        {% for item in items %}
+        <div class="grid gap-4 rounded-[2rem] border border-white/10 bg-zinc-950/70 p-5 shadow-xl shadow-black/15 sm:grid-cols-[120px_minmax(0,1fr)]">
+          <div class="overflow-hidden rounded-3xl bg-zinc-900">
+            <img
+              src="{{ item.image_url or ('https://picsum.photos/seed/cart-' ~ item.product_id ~ '/320/240') }}"
+              alt="{{ item.name }}"
+              class="h-full w-full object-cover"
+            />
+          </div>
+          <div class="flex flex-col justify-between gap-4">
+            <div>
+              <div class="text-base font-semibold text-white">{{ item.name }}</div>
+              <div class="mt-2 text-sm text-zinc-400">₹{{ "%.2f"|format(item.price) }} each</div>
+              <div class="mt-2 text-sm text-zinc-400">Qty: <span class="font-semibold text-white">{{ item.quantity }}</span></div>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+              <div class="text-lg font-semibold text-white">₹{{ "%.2f"|format(item.line_total) }}</div>
+              <div class="flex gap-2">
+                <form action="{{ url_for('cart_add', product_id=item.product_id) }}" method="post">
+                  <button
+                    type="submit"
+                    class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-zinc-100 transition hover:bg-white/10"
+                  >
+                    Add
+                  </button>
+                </form>
+                <button
+                  data-remove-from-cart="{{ item.product_id }}"
+                  class="rounded-full border border-rose-400/25 bg-rose-400/10 px-4 py-2 text-sm font-semibold text-rose-100 transition hover:bg-rose-400/15"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="rounded-[2rem] border border-white/10 bg-zinc-950/70 p-6 shadow-2xl shadow-black/20">
+        <div class="flex items-center justify-between gap-4">
+          <div>
+            <div class="text-lg font-semibold text-white">Order Summary</div>
+            <div class="text-sm text-zinc-400">{{ items|length }} items selected</div>
+          </div>
+          <div class="rounded-full bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.25em] text-zinc-300">Premium</div>
+        </div>
+
+        <div class="mt-5 space-y-3 text-sm text-zinc-300">
+          <div class="flex items-center justify-between">
+            <span>Subtotal</span>
+            <span class="font-semibold text-white">₹{{ "%.2f"|format(subtotal) }}</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span>Delivery</span>
+            <span class="font-semibold text-white">₹0.00</span>
+          </div>
+          <div class="h-px bg-white/10"></div>
+          <div class="flex items-center justify-between text-base font-semibold text-white">
+            <span>Total</span>
+            <span>₹{{ "%.2f"|format(subtotal) }}</span>
+          </div>
+        </div>
+
+        <form action="{{ url_for('checkout') }}" method="post" class="mt-6 space-y-4">
+          <div class="space-y-3">
+            <div class="text-sm font-semibold text-white">Shipping details</div>
+            <input name="full_name" required placeholder="Full name" class="w-full rounded-3xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-sm text-white placeholder:text-zinc-500 outline-none transition focus:border-white/20" />
+            <input name="line1" required placeholder="Address line 1" class="w-full rounded-3xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-sm text-white placeholder:text-zinc-500 outline-none transition focus:border-white/20" />
+            <input name="line2" placeholder="Address line 2 (optional)" class="w-full rounded-3xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-sm text-white placeholder:text-zinc-500 outline-none transition focus:border-white/20" />
+            <div class="grid gap-3 sm:grid-cols-2">
+              <input name="city" required placeholder="City" class="w-full rounded-3xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-sm text-white placeholder:text-zinc-500 outline-none transition focus:border-white/20" />
+              <input name="state" required placeholder="State" class="w-full rounded-3xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-sm text-white placeholder:text-zinc-500 outline-none transition focus:border-white/20" />
+            </div>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <input name="postal_code" required placeholder="Postal code" class="w-full rounded-3xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-sm text-white placeholder:text-zinc-500 outline-none transition focus:border-white/20" />
+              <input name="country" required placeholder="Country" value="India" class="w-full rounded-3xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-sm text-white placeholder:text-zinc-500 outline-none transition focus:border-white/20" />
+            </div>
+            <input name="phone" placeholder="Phone (optional)" class="w-full rounded-3xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-sm text-white placeholder:text-zinc-500 outline-none transition focus:border-white/20" />
+          </div>
+
+          <div class="space-y-2">
+            <div class="text-sm font-semibold text-white">Payment</div>
+            <select name="payment_method" class="w-full rounded-3xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-sm text-white outline-none transition focus:border-white/20">
+              <option value="cod">Cash on Delivery</option>
+              <option value="upi">UPI</option>
+              <option value="card">Card</option>
+            </select>
+          </div>
+
+          <button type="submit" class="inline-flex w-full items-center justify-center rounded-3xl bg-gradient-to-r from-[#E5D3B3] to-[#bfa77c] px-4 py-3 text-sm font-semibold text-zinc-950 transition hover:brightness-110 active:scale-[0.98]">Checkout</button>
+
+          <div class="text-xs text-zinc-400">Checkout is atomic: order, order items, tracking, and payment are written in one transaction.</div>
+        </form>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}
