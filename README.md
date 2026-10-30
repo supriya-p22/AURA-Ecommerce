@@ -91,7 +91,9 @@ Open the local URL displayed in your terminal.
 A collaborative project developed by:
 
 - Supriya — [GitHub](https://github.com/supriya-p22)
-- Add teammate names and GitHub profiles here.
+- Suprita -
+- Vinuthna -
+- Zainab -
 
 ## 📌 Project Status
 
