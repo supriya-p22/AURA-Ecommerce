@@ -91,9 +91,9 @@ Open the local URL displayed in your terminal.
 A collaborative project developed by:
 
 - Supriya — [GitHub](https://github.com/supriya-p22)
-- Suprita -
-- Vinuthna -
-- Zainab -
+- Suprita - [GitHub](https://github.com/suprita3112)
+- Vinuthna - [GitHub](https://github.com/Vinuthna18)
+- Zainab - [GitHub](https://github.com/zainabb-syed)
 
 ## 📌 Project Status
 
